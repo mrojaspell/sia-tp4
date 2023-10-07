@@ -73,7 +73,7 @@ def generate_heatmap(k, matrix):
 if __name__ == "__main__":
     data = load_data("./training_data/europe.csv")
 
-    with open("config.json") as file:
+    with open("config_ej1.json") as file:
         config = json.load(file)
 
     # se le resta 1 al tamaño del input pues el nombre del pais no se usa
