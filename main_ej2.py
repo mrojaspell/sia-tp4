@@ -16,5 +16,5 @@ if __name__ == "__main__":
 
     for i in range(len(result)):
         for j in range(len(result)):
-            print(result[i][j],end=" ")
+            print(result[i][j], end=" ")
         print()

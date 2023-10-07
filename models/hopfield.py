@@ -18,7 +18,7 @@ def unvectorize_pattern(vector):
     for i in range(size):
         array.append([])
         for j in range(size):
-            array[i].append(vector[i + j])
+            array[i].append(vector[i*size + j])
     return array
 
 
@@ -93,7 +93,7 @@ class Hopfield:
         i = 0
         while i <= 100000:
             result = sign(prev, self.weight_matrix @ prev)
-            if np.array_equal(result,prev):
+            if np.array_equal(result, prev):
                 return unvectorize_pattern(result)
             prev = result
             i += 1
