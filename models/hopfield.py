@@ -1,4 +1,7 @@
+import math
+
 import numpy as np
+
 
 def vectorize_pattern(pattern):
     array = []
@@ -7,22 +10,42 @@ def vectorize_pattern(pattern):
             array.append(pattern[i][j])
     return np.array(array)
 
-def sign(x):
-    if x > 0:
-        return 1
-    if x < 0:
-        return -1
-    return x
+
+def unvectorize_pattern(vector):
+    # Asume una matriz cuadrada
+    size = int(math.sqrt(len(vector)))
+    array = []
+    for i in range(size):
+        array.append([])
+        for j in range(size):
+            array[i].append(vector[i + j])
+    return array
+
+
+# TODO: fijarse la performance
+def sign(old_vector, new_vector):
+    resp = []
+    for idx, elem in enumerate(new_vector):
+        if elem > 0:
+            resp.append(1)
+        elif elem < 0:
+            resp.append(-1)
+        else:
+            resp.append(old_vector[idx])
+    return np.array(resp)
 
 
 class Hopfield:
     def __init__(self, patterns):
-        self.patterns = patterns                # Patterns es lista de matrices
+        self.patterns = patterns  # Patterns es lista de matrices
         self.matrix_dimension = len(patterns[0])
         self.weight_matrix = np.zeros((self.matrix_dimension ** 2, self.matrix_dimension ** 2))
         self.sign_function = np.vectorize(sign)
 
         size = len(self.patterns[0])
+
+        #self.weight_matrix = self.initialize_weights()
+
 
         # Completamos pesos (triangulo inferior)
         for i in range(size * size):
@@ -34,8 +57,25 @@ class Hopfield:
             for j in range(0, i):
                 self.weight_matrix[i][j] = self.weight_matrix[j][i]
 
+    def initialize_weights(self):
+        matrix = []
+        for pattern in self.patterns:
+            matrix.append(vectorize_pattern(pattern))
 
-    def get_weight(self,elem1,elem2):
+        row_data_matrix = np.array(matrix)
+
+        columnar_data_matrix = np.transpose(matrix)
+
+        weights = (columnar_data_matrix @ row_data_matrix) / 25
+
+        for i in range(len(weights)):
+            for j in range(len(weights)):
+                if i == j:
+                    weights[i][j] = 0
+
+        return weights
+
+    def get_weight(self, elem1, elem2):
         row1 = elem1 // self.matrix_dimension
         col1 = elem1 % self.matrix_dimension
         row2 = elem2 // self.matrix_dimension
@@ -46,14 +86,19 @@ class Hopfield:
 
         return result / (self.matrix_dimension ** 2)
 
-
-
     def recognize_pattern(self, pattern):
-        vector = vectorize_pattern(pattern)
-        vector =
+        prev = vectorize_pattern(pattern)
+
+        result = None  # por el scope de python
         i = 0
-        prev = None
-        while i <= 10000:
-
+        while i <= 100000:
+            result = sign(prev, self.weight_matrix @ prev)
+            if np.array_equal(result,prev):
+                return unvectorize_pattern(result)
             prev = result
+            i += 1
 
+        if result is not None:
+            return unvectorize_pattern(result)
+
+        raise ValueError("Result no puede ser nulo, algo raro esta pasando")
