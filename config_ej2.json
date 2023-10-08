@@ -1,0 +1,6 @@
+{
+  "training_data": "./training_data/letters_matrix.json",
+  "selection_size": 4,
+  "selection_index": 1,
+  "limit": 10000
+}
