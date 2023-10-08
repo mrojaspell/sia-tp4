@@ -1,3 +1,4 @@
+import copy
 import json
 import random
 import numpy as np
@@ -12,7 +13,7 @@ INPUT_SIZE = 4
 # considerando el valor aleatorio inicial.
 def generate_random_most_orthogonal(input_values, size):
 
-    random.shuffle(input_values)
+    random.shuffle(copy.deepcopy(input_values))
 
     resp = [input_values.pop()]
     min_dot = None
@@ -31,6 +32,19 @@ def generate_random_most_orthogonal(input_values, size):
     return resp
 
 
+def noisify_pattern(pattern, noise_prob):
+    # No alteramos el original
+    pattern = copy.deepcopy(pattern)
+
+    # Asume que pattern esta vectorizado
+    for i in range(len(pattern)):
+        chance = random.uniform(0,1)
+        if chance < noise_prob:
+            pattern[i] = - pattern[i]
+
+    return pattern
+
+
 if __name__ == "__main__":
 
     with open("config_ej2.json") as file:
@@ -47,18 +61,17 @@ if __name__ == "__main__":
 
     hopfield = Hopfield(selected)
 
-    result = hopfield.recognize_pattern(selected[0], config["limit"])
+    selected_pattern = selected[0]
 
-    print("Result: ")
+    result = hopfield.recognize_pattern(noisify_pattern(selected_pattern, config["noise_level"]), config["limit"])
+
+    equal = True
     for i in range(len(result)):
         for j in range(len(result)):
-            print(result[i][j], end=" ")
-        print()
+            if result[i][j] != selected_pattern[5*i + j]:
+                equal = False
 
-    print("Expected: ")
-    for i in range(5):
-        for j in range(5):
-            print(selected[0][5*i + j],end=" ")
-        print()
-
-
+    if equal:
+        print("Recognized correctly!")
+    else:
+        print("Did not recognize!")

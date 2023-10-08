@@ -1,6 +1,7 @@
 {
   "training_data": "./training_data/letters_matrix.json",
-  "selection_size": 4,
   "selection_index": 1,
+  "selection_size": 4,
+  "noise_level": 0.05,
   "limit": 10000
 }
