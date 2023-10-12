@@ -88,6 +88,42 @@ def generate_heatmap(k, matrix):
     fig.show()
 
 
+def generate_u_matrix(neuron_matrix, k):
+    # Initialize an empty U-matrix
+    u_matrix = np.zeros((k, k))
+
+    for i in range(k):
+        for j in range(k):
+            neuron = neuron_matrix[i, j]
+            neighbors = []
+            # Iterate through the neighbors of the current neuron
+            for m in range(max(0, i - 1), min(k, i + 2)):
+                for n in range(max(0, j - 1), min(k, j + 2)):
+                    if (i, j) != (m, n):
+                        neighbors.append(neuron_matrix[m, n])
+
+            # Calculate the mean Euclidean distance between the current neuron and its neighbors
+            neighbors = np.array(neighbors)
+            average = 0
+            for neighbor in neighbors:
+                sum = (neuron.weights - neighbor.weights) ** 2
+                sum = np.sum(sum)
+                average += sum
+            average /= len(neighbors)
+            u_matrix[i][j] = average
+
+    # Create a Plotly heatmap trace for the U-matrix
+    heatmap_trace = go.Heatmap(z=u_matrix,
+                               text=u_matrix,
+                               texttemplate="%{text}",
+                               textfont={"size": 10},
+                               colorscale='Greys')
+
+    layout = go.Layout(title='Kohonen U-Matrix')
+    fig = go.Figure(data=[heatmap_trace], layout=layout)
+    fig.show()
+
+
 if __name__ == "__main__":
     data = load_data("./training_data/europe.csv")
 
@@ -101,14 +137,11 @@ if __name__ == "__main__":
 
     resp = model.test()
 
-    pprint.pprint(resp)
-    for row in resp:
-        for col in row:
-            print(f"{len(col)} ", end='')
-        print()
-
     if config["generate_heatmap"]:
         generate_heatmap(config["k"], resp)
+
+    if config["generate_U_matrix"]:
+        generate_u_matrix(model.neurons, config["k"])
 
 
 

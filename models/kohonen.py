@@ -5,8 +5,6 @@ from scipy import stats
 import math
 
 
-
-
 def calculate_euclidean_distance(vector1, vector2):
     return np.linalg.norm(vector2 - vector1)
 
