@@ -52,10 +52,7 @@ class Hopfield:
 
         weights = (columnar_data_matrix @ row_data_matrix) / 25     # 1/N * (K * K^T)
 
-        for i in range(len(weights)):
-            for j in range(len(weights)):
-                if i == j:
-                    weights[i][j] = 0
+        np.fill_diagonal(weights, 0)
 
         return weights
 
