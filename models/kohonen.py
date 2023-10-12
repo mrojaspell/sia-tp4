@@ -56,7 +56,7 @@ class Kohonen:
         self.radius = radius
         self.learning_rate = initial_learning_rate
 
-    def train(self, limit):
+    def train(self, limit, variable_radius=False):
         size = len(self.training_data)
         for i in range(limit):
             idx = random.randint(0, size - 1)
@@ -65,6 +65,12 @@ class Kohonen:
             row, col = self.get_winner_neuron(data)
 
             self.update_weights(row, col, data)
+
+            if variable_radius:
+                if self.radius > 1:
+                    self.radius -= 1
+                if self.radius < 1:
+                    self.radius = 1
 
     def test(self):
 

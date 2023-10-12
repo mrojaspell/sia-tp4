@@ -88,7 +88,7 @@ def generate_heatmap(k, matrix):
     fig.show()
 
 
-def generate_u_matrix(neuron_matrix, k):
+def generate_u_matrix(neuron_matrix, k, radius):
     # Initialize an empty U-matrix
     u_matrix = np.zeros((k, k))
 
@@ -97,9 +97,9 @@ def generate_u_matrix(neuron_matrix, k):
             neuron = neuron_matrix[i, j]
             neighbors = []
             # Iterate through the neighbors of the current neuron
-            for m in range(max(0, i - 1), min(k, i + 2)):
-                for n in range(max(0, j - 1), min(k, j + 2)):
-                    if (i, j) != (m, n):
+            for m in range(k):
+                for n in range(k):
+                    if (i, j) != (m, n) and ((i-m) ** 2 + (j-n) ** 2) <= radius ** 2:
                         neighbors.append(neuron_matrix[m, n])
 
             # Calculate the mean Euclidean distance between the current neuron and its neighbors
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     # se le resta 1 al tamaño del input pues el nombre del pais no se usa
     model = Kohonen(len(data[0]) - 1, config["k"], config["radius"], config["initial_learning_rate"], data, config["initialize_random"])
 
-    model.train(config["train_limit"])
+    model.train(config["train_limit"], config["variable_radius"])
 
     resp = model.test()
 
@@ -141,7 +141,11 @@ if __name__ == "__main__":
         generate_heatmap(config["k"], resp)
 
     if config["generate_U_matrix"]:
-        generate_u_matrix(model.neurons, config["k"])
+        if not config["variable_radius"]:
+            generate_u_matrix(model.neurons, config["k"], config["radius"])
+        else:
+            generate_u_matrix(model.neurons, config["k"], 1)
+
 
 
 

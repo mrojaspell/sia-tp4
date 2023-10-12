@@ -1,9 +1,10 @@
 {
   "k": 3,
-  "radius": 1,
+  "radius": 2.5,
+  "variable_radius": true,
   "initial_learning_rate": 0.2,
   "initialize_random": true,
   "train_limit": 50000,
-  "generate_heatmap": false,
+  "generate_heatmap": true,
   "generate_U_matrix": true
 }
