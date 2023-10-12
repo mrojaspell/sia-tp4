@@ -44,7 +44,23 @@ def generate_heatmap(k, matrix):
     num_countries_matrix = [[len(matrix[i][j]) for j in range(k)] for i in range(k)]
 
     # Create a list to store the labels for each cell
-    labels = [[f'{num_countries_matrix[i][j]}: {", ".join(matrix[i][j])}' for j in range(k)] for i in range(k)]
+    labels = []
+
+    for i in range(k):
+        row_labels = []
+        for j in range(k):
+            countries = matrix[i][j]
+            t = 0
+            group = ''
+            for name in countries:
+                group += name
+                if t < len(countries) - 1:
+                    group += ', '  # Add a comma if it's not the last country
+                if t % 3 == 2:
+                    group += '<br>'
+                t += 1
+            row_labels.append(group)
+        labels.append(row_labels)
 
     # Reverse the color scale
     colorscale = 'YlGnBu'
@@ -55,6 +71,8 @@ def generate_heatmap(k, matrix):
         x=[f'Column {i + 1}' for i in range(k)],
         y=[f'Row {i + 1}' for i in range(k)],
         text=labels,
+        texttemplate="%{text}",
+        textfont={"size": 10},
         colorscale=colorscale,
         reversescale=True,
         colorbar=dict(title="Number of Countries")
