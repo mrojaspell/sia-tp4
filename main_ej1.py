@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 import plotly.graph_objects as go
-from scipy import stats
+
 
 from models.kohonen import Kohonen
 import pprint
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         config = json.load(file)
 
     # se le resta 1 al tamaño del input pues el nombre del pais no se usa
-    model = Kohonen(len(data[0]) - 1, config["k"], config["radius"], config["initial_learning_rate"], data, config["initialize_random"])
+    model = Kohonen(len(data[0]) - 1, config["k"], config["radius"], config["initial_learning_rate"], config["variable_learning_rate"],data, config["initialize_random"])
 
     model.train(config["train_limit"], config["variable_radius"])
 

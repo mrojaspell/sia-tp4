@@ -36,9 +36,11 @@ class Kohonen:
             self.winners.append(winner)
 
     # x es la cantidad de atributos por cada input
-    def __init__(self, x, k, radius, initial_learning_rate, training_data, initialized_random=True):
-        self.neurons = np.empty(dtype=Kohonen.Neuron, shape=(k, k))
 
+
+    def __init__(self, x, k, radius, initial_learning_rate, variable_learning_rate,training_data, initialized_random=True):
+        self.neurons = np.empty(dtype=Kohonen.Neuron, shape=(k, k))
+        self.variable_learning_rate = variable_learning_rate
         self.training_data = standardize_input(training_data)
 
         for i in range(k):
@@ -56,6 +58,12 @@ class Kohonen:
         self.radius = radius
         self.learning_rate = initial_learning_rate
 
+    def get_learning_rate(self,iteration=None):
+        if not self.variable_learning_rate or iteration is None or iteration == 0:
+            return self.learning_rate
+        return self.learning_rate / iteration
+
+
     def train(self, limit, variable_radius=False):
         size = len(self.training_data)
         for i in range(limit):
@@ -64,7 +72,7 @@ class Kohonen:
 
             row, col = self.get_winner_neuron(data)
 
-            self.update_weights(row, col, data)
+            self.update_weights(row, col, data,i)
 
             if variable_radius:
                 if self.radius > 1:
@@ -86,7 +94,7 @@ class Kohonen:
             resp[row][col].append(city)
         return resp
 
-    def update_weights(self, row, col, current_input):
+    def update_weights(self, row, col, current_input,iteration):
         radius = min(self.radius,
                      (2 ** 1 / 2) * len(self.neurons))  # actoamos radio por diagonal de la matriz, sqrt(2) * K
         min_fil = math.floor(row - radius)
@@ -101,7 +109,7 @@ class Kohonen:
                 if distance <= radius and 0 <= current_row < len(self.neurons) and 0 <= current_col < len(self.neurons[0]):
                     # se actualizan los pesos
                     neuron = self.neurons[current_row][current_col]
-                    neuron.weights = neuron.weights + self.learning_rate * (current_input - neuron.weights)
+                    neuron.weights = neuron.weights + self.get_learning_rate(iteration) * (current_input - neuron.weights)
 
     def get_winner_neuron(self, data):
 

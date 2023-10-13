@@ -1,8 +1,9 @@
 {
-  "k": 3,
+  "k": 4,
   "radius": 2.5,
   "variable_radius": true,
-  "initial_learning_rate": 0.2,
+  "initial_learning_rate": 0.8,
+  "variable_learning_rate" : false,
   "initialize_random": true,
   "train_limit": 50000,
   "generate_heatmap": true,
