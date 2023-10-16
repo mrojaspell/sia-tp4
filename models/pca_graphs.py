@@ -1,66 +1,94 @@
 import pandas as pd
-import sklearn
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 
-data = pd.read_csv('../training_data/europe.csv')
+def biplot_graph(score, coeff, labels, label_names):
+    xs = score[:, 0]
+    ys = score[:, 1]
 
-features = data[['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']]
+    # escalamos las variables
+    scalex = 1.0 / (xs.max() - xs.min())
+    scaley = 1.0 / (ys.max() - ys.min())
 
-# Standardize data -> substract mean and divide by standard deviation
-scaler = StandardScaler()
-scaled_features = scaler.fit_transform(features)
+    xs_scaled = xs * scalex
+    ys_scaled = ys * scaley
 
-# n_components is the components to keep, 2 for 2D visualization
-pca = PCA()
-pca_result = pca.fit_transform(scaled_features)
+    fig = px.scatter(
+        x=xs_scaled, y=ys_scaled,
+        text=labels,
+        title="Biplot",
+        labels={'x': 'PC1', 'y': 'PC2'}
+    )
 
-explained_variance = pca.explained_variance_ratio_
-print(f"The variance of each component is {explained_variance}")
-print(pca.components_)
+    for i in range(len(labels)):
+        fig.add_annotation(x=xs_scaled[i], y=ys_scaled[i], text=labels[i], showarrow=False, font=dict(size=1))
+
+    colors = px.colors.qualitative.Set2
+    for i, label in enumerate(label_names):
+        fig.add_shape(
+            go.layout.Shape(
+                type='line',
+                x0=0,
+                y0=0,
+                x1=coeff[i, 0],
+                y1=coeff[i, 1],
+                line=dict(color=colors[i], width=2),
+            )
+        )
+        fig.add_annotation(
+            x=coeff[i, 0] * 1.15,
+            y=coeff[i, 1] * 1.15,
+            text=label,
+            showarrow=False,
+            font=dict(color=colors[i], size=10)
+        )
+
+    fig.update_xaxes(title_text="PC1")
+    fig.update_yaxes(title_text="PC2")
+    fig.update_layout(showlegend=False)
+
+    return fig
 
 
+def main():
+    df = pd.read_csv('europe.csv')
 
-# # Create a scatter plot of the scores on PC1 vs PC2
-# plt.figure(figsize=(10, 8))
-# plt.scatter(pca_result[:, 0], pca_result[:, 1], alpha=0.5)
-#
-# # Add arrows to represent the variable loadings
-# for i, var in enumerate(pca.components_.T):
-#     plt.arrow(0, 0, var[0], var[1], color='r', alpha=0.5)
-#     plt.text(var[0], var[1], features.columns[i], fontsize=12)
-#
-# # Label the axes
-# plt.xlabel('Principal Component 1')
-# plt.ylabel('Principal Component 2')
-#
-# # Show the biplot
-# plt.grid()
-# plt.show()
+    features = ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']
+    x = df.loc[:, features].values
+    x = StandardScaler().fit_transform(x)
+
+    pca = PCA(n_components=2)
+    principalComponents = pca.fit_transform(x)
+
+    biplot_fig = biplot_graph(principalComponents, np.transpose(pca.components_[0:2, :]), df['Country'], features)
+    biplot_fig.show()
+
+    variance_explained = pca.explained_variance_ratio_
+    fig = px.pie(
+        values=variance_explained,
+        names=["PC1", "PC2"],
+        title="Variance of each component",
+        labels={'labels': 'Component'}
+    )
+    fig.show()
+
+    df_pc1 = pd.DataFrame({'Country': df['Country'], 'PC1': principalComponents[:, 0]})
+    df_pc1 = df_pc1.sort_values(by='PC1', ascending=False)
+
+    fig = px.bar(
+        df_pc1,
+        x='PC1',
+        y='Country',
+        orientation='h',
+        title='PC1 values of each country',
+        labels={'PC1': 'PC1 Values', 'Country': 'Country'},
+    )
+    fig.update_layout(xaxis_title="PC1 Values", yaxis_title="Country")
+    fig.show()
 
 
-#
-pca_df = pd.DataFrame(pca_result, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6', 'PC7'])
-
-# Create a biplot using Plotly Express
-biplot = px.scatter(
-    pca_df, x='PC1', y='PC2',
-    labels={'PC1': 'Principal Component 1', 'PC2': 'Principal Component 2'},
-    title='PCA Biplot'
-)
-colors = px.colors.qualitative.Set1
-
-# Add feature loadings to the biplot
-loadings = pca.components_.T
-loadings_df = pd.DataFrame(loadings, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6', 'PC7'], index=features.columns)
-for i, feature in enumerate(loadings_df.index):
-    biplot.add_trace(go.Scatter(x=[0, loadings_df.loc[feature, 'PC1']], y=[0, loadings_df.loc[feature, 'PC2']],
-                               mode='lines+text', line=dict(color=colors[i], width=1),
-                               name=feature))
-for i, country in enumerate(data['Country']):
-    biplot.add_annotation(x=pca_df['PC1'][i], y=pca_df['PC2'][i], text=country, showarrow=False)
-biplot.show()
+main()
