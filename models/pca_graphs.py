@@ -53,13 +53,30 @@ def biplot_graph(score, coeff, labels, label_names):
 
     return fig
 
+def box_plot_graph(dataframe, title):
+    fig = go.Figure()
+    for col in dataframe.columns:
+        fig.add_trace(go.Box(y=dataframe[col], name=col, boxmean=True, boxpoints=False))
+    fig.update_xaxes(title='Variable')
+    fig.update_layout(title=title)
+    return fig
 
 def main():
-    df = pd.read_csv('europe.csv')
+    df = pd.read_csv('../training_data/europe.csv')
+
+    df_long = pd.melt(df, var_name='Column Name', value_name='Values')
+    fig = px.box(df_long, x='Column Name', y='Values')
+    fig.update_xaxes(tickangle=90, tickfont=dict(size=10))
+    fig.update_layout(title_text='Before Standardizing')
+    fig.show()
 
     features = ['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.growth', 'Unemployment']
     x = df.loc[:, features].values
     x = StandardScaler().fit_transform(x)
+
+    df_standardized = pd.DataFrame(x, columns=features)
+    after_standardized = box_plot_graph(df_standardized, 'After Standardizing')
+    after_standardized.show()
 
     pca = PCA(n_components=2)
     principalComponents = pca.fit_transform(x)
