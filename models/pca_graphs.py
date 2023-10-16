@@ -1,3 +1,5 @@
+import copy
+
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -61,6 +63,30 @@ def box_plot_graph(dataframe, title):
     fig.update_layout(title=title)
     return fig
 
+def variance_ration_graph(dataframe):
+    nums = np.arange(1,8)
+
+    var_ratio = []
+    for num in nums:
+        pca = PCA(n_components=num)
+        pca.fit(dataframe)
+        var_ratio.append(np.sum(pca.explained_variance_ratio_))
+
+    trace = go.Scatter(x=nums, y=var_ratio, mode='lines+markers')
+
+    # Create the layout for the plot
+    layout = go.Layout(
+        title='Variance VS Components',
+        xaxis=dict(title='number of components'),
+        yaxis=dict(title='Acummulated Variance'),
+    )
+
+    # Create the figure
+    fig = go.Figure(data=[trace], layout=layout)
+
+    # Show the plot
+    fig.show()
+
 def main():
     df = pd.read_csv('../training_data/europe.csv')
 
@@ -78,6 +104,7 @@ def main():
     after_standardized = box_plot_graph(df_standardized, 'After Standardizing')
     after_standardized.show()
 
+    variance_ration_graph(copy.deepcopy(x))
     pca = PCA(n_components=2)
     principalComponents = pca.fit_transform(x)
 
