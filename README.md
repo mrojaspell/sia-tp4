@@ -1,2 +1,2 @@
 # sia-tp4
-cuarto tp de sia
+Implementation of Hopfield and Kohonen models for Artificial Intelligence Systems class
