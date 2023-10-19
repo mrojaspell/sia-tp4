@@ -1,13 +1,9 @@
 import csv
 import json
-import math
-
 import numpy as np
 import plotly.graph_objects as go
-
-
 from models.kohonen import Kohonen
-import pprint
+
 
 
 def load_data(path: str):
