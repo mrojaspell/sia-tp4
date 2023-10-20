@@ -64,16 +64,20 @@ def noisify_pattern(pattern, noise_prob):
 
 def energy_graph(pattern_energy):
     # Find the largest length of arrays
-    max_length = max(len(values) for values in pattern_energy.values())
+    max_length = max(len(entry['values']) for entry in pattern_energy.values())
 
     # Create a list to hold all traces for each letter
     traces = []
 
     # Create a trace for each letter
-    for letter, values in pattern_energy.items():
+    for letter, entry in pattern_energy.items():
+        values = entry['values']
+        recognized = entry['recognized']
         x = list(range(1, max_length + 1))  # Make 'x' values consistent
         y = values + [None] * (max_length - len(values))  # Fill with None for shorter arrays
-        trace = go.Scatter(x=x, y=y, mode='lines+markers', name=letter)
+        recognition_status = "Recognized" if recognized else "Not Recognized"
+        label = f"{letter} ({recognition_status})"
+        trace = go.Scatter(x=x, y=y, mode='lines+markers', name=label)
         traces.append(trace)
 
     # Create the layout for the plot
@@ -120,7 +124,8 @@ if __name__ == "__main__":
 
         result, energy = hopfield.recognize_pattern(noisify_pattern(selected_pattern, config["noise_level"]), config["limit"])
 
-        patterns_energy[orthogonal_avg[selection_index][1][idx]] = energy
+        patterns_energy[orthogonal_avg[selection_index][1][idx]] = {}
+        patterns_energy[orthogonal_avg[selection_index][1][idx]]["values"] = energy
 
         equal = True
         for i in range(len(result)):
@@ -130,8 +135,10 @@ if __name__ == "__main__":
 
         if equal:
             print("Recognized correctly!")
+            patterns_energy[orthogonal_avg[selection_index][1][idx]]["recognized"] = True
         else:
             print("Did not recognize!")
+            patterns_energy[orthogonal_avg[selection_index][1][idx]]["recognized"] = False
 
     if config["generate_energy_graph"]:
         energy_graph(patterns_energy)
