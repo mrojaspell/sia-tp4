@@ -84,16 +84,28 @@ class Hopfield:
         return result / (self.matrix_dimension ** 2)
 
     def recognize_pattern(self, pattern, limit):
-        prev = pattern
+        prev = None
 
-        result = None  # por el scope de python
+        result = pattern  # por el scope de python
         i = 0
+        self.calculate_energy(result)
         while i <= limit and not np.array_equal(result, prev):
-            result = sign(prev, self.weight_matrix @ prev)
             prev = result
+            result = sign(prev, self.weight_matrix @ prev)
+            self.calculate_energy(prev)
             i += 1
 
         if result is not None:
             return unvectorize_pattern(result)
 
         raise ValueError("Result no puede ser nulo, algo raro esta pasando")
+
+    def calculate_energy(self, pattern):
+        energy = 0
+        for i in range(self.matrix_dimension):
+            for j in range(i+1, self.matrix_dimension):
+                energy += self.weight_matrix[i][j] * pattern[i] * pattern[j]
+        energy *= -1
+        print(f"energy {energy}")
+
+
