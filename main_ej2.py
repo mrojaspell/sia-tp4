@@ -2,11 +2,10 @@ import copy
 import itertools
 import json
 import random
+import plotly.graph_objects as go
+import pandas as pd
 import numpy as np
-from models.hopfield import Hopfield, vectorize_pattern
-
-
-INPUT_SIZE = 4
+from models.hopfield import Hopfield, vectorize_pattern, unvectorize_pattern
 
 
 # Genera un conjunto "mas othogonal" comenzando de un elemento aleatorio.
@@ -63,6 +62,34 @@ def noisify_pattern(pattern, noise_prob):
     return pattern
 
 
+def energy_graph(pattern_energy):
+    # Find the largest length of arrays
+    max_length = max(len(values) for values in pattern_energy.values())
+
+    # Create a list to hold all traces for each letter
+    traces = []
+
+    # Create a trace for each letter
+    for letter, values in pattern_energy.items():
+        x = list(range(1, max_length + 1))  # Make 'x' values consistent
+        y = values + [None] * (max_length - len(values))  # Fill with None for shorter arrays
+        trace = go.Scatter(x=x, y=y, mode='lines+markers', name=letter)
+        traces.append(trace)
+
+    # Create the layout for the plot
+    layout = go.Layout(
+        title='Energy levels for each letter through iterations',
+        xaxis=dict(title='Iteration'),
+        yaxis=dict(title='Energy'),
+    )
+
+    # Create the figure
+    fig = go.Figure(data=traces, layout=layout)
+
+    # Show the plot
+    fig.show()
+
+
 if __name__ == "__main__":
 
     with open("config_ej2.json") as file:
@@ -85,11 +112,15 @@ if __name__ == "__main__":
 
     hopfield = Hopfield(selected)
 
+    patterns_energy = {}
+
     for idx, selected_pattern in enumerate(selected):
 
         print(f"\nAttempting to recognize: {orthogonal_avg[selection_index][1][idx]}")
 
-        result = hopfield.recognize_pattern(noisify_pattern(selected_pattern, config["noise_level"]), config["limit"])
+        result, energy = hopfield.recognize_pattern(noisify_pattern(selected_pattern, config["noise_level"]), config["limit"])
+
+        patterns_energy[orthogonal_avg[selection_index][1][idx]] = energy
 
         equal = True
         for i in range(len(result)):
@@ -101,3 +132,7 @@ if __name__ == "__main__":
             print("Recognized correctly!")
         else:
             print("Did not recognize!")
+
+    if config["generate_energy_graph"]:
+        energy_graph(patterns_energy)
+
