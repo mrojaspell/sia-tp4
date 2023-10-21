@@ -6,7 +6,7 @@ import numpy as np
 def initialize_weights(size):
     resp = []
     for _ in range(size):
-        resp.append(np.random.uniform(0,1))
+        resp.append(np.random.uniform(0, 1))
     return np.array(resp)
 
 
@@ -23,6 +23,8 @@ class LinearPerceptron:
                 activation = self.compute_activation(row)
 
                 self.update_weights(learning_constant, activation, row)
+
+        return self.weights
 
     def compute_activation(self, row):
         return np.dot(row, self.weights)
