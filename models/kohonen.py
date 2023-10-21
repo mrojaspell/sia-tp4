@@ -15,8 +15,14 @@ def standardize_input(data):
             new_data.append(float(data[idx][i]))
         training_data.append(new_data)
 
-    for idx, elem in enumerate(training_data):
-        resp[idx][1] = np.array(stats.zscore(elem))
+    training_data = np.transpose(training_data)
+    std_data = []
+    for row in training_data:
+        std_data.append(np.array(stats.zscore(row)))
+    std_data = np.transpose(std_data)
+
+    for idx, row in enumerate(std_data):
+        resp[idx][1] = np.array(row)
 
     return np.array(resp)
 
