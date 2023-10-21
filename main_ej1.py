@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 from models.kohonen import Kohonen
 
 
-
 def load_data(path: str):
     data = []
     with open(path, "r") as f:
@@ -32,7 +31,7 @@ def load_data(path: str):
             data.append(row_data)
 
     # Convert the list of lists to a NumPy array
-    return np.array(data)
+    return data
 
 
 def generate_heatmap(k, matrix):
@@ -127,7 +126,7 @@ if __name__ == "__main__":
         config = json.load(file)
 
     # se le resta 1 al tamaño del input pues el nombre del pais no se usa
-    model = Kohonen(len(data[0]) - 1, config["k"], config["radius"], config["initial_learning_rate"], config["variable_learning_rate"],data, config["initialize_random"])
+    model = Kohonen(len(data[0]) - 1, config["k"], config["radius"], config["initial_learning_rate"], config["variable_learning_rate"], data, config["initialize_random"])
 
     model.train(config["train_limit"], config["variable_radius"])
 

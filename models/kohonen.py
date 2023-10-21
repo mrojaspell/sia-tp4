@@ -1,11 +1,7 @@
 import random
 import numpy as np
-from scipy import stats
 import math
-
-
-def calculate_euclidean_distance(vector1, vector2):
-    return np.linalg.norm(vector2 - vector1)
+from scipy.stats import stats
 
 
 def standardize_input(data):
@@ -23,6 +19,9 @@ def standardize_input(data):
         resp[idx][1] = np.array(stats.zscore(elem))
 
     return np.array(resp)
+
+def calculate_euclidean_distance(vector1, vector2):
+    return np.linalg.norm(vector2 - vector1)
 
 
 class Kohonen:
