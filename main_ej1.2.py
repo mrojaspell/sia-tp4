@@ -60,7 +60,7 @@ def weight_comparison_graph(oja_weights, pca_weights):
 
     # Create a grouped bar chart using Plotly Express
     fig = px.bar(df_melted, x='Attribute', y='Weight', color='Method',
-                 barmode='group', labels={'Method': 'Method'}, title='Principal Component Weight by Country')
+                 barmode='group', labels={'Method': 'Method'}, title='Principal Component Weight by Attribute')
 
     # Show the plot
     fig.show()
@@ -68,8 +68,6 @@ def weight_comparison_graph(oja_weights, pca_weights):
 
 if __name__ == "__main__":
     data = load_data("./training_data/europe.csv")
-
-    print(data)
 
     with open("config_ej1.2.json") as file:
         config = json.load(file)
