@@ -75,7 +75,7 @@ def generate_heatmap(k, matrix):
 
     # Customize the layout
     fig.update_layout(
-        title='Number of Countries in Each Position',
+        title='Kohonen Heatmap for countries',
         xaxis=dict(side='top'),
     )
 
