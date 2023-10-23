@@ -5,7 +5,9 @@
   "initial_learning_rate": 0.5,
   "variable_learning_rate" : true,
   "initialize_random": false,
-  "train_limit": 14000,
+  "train_limit": 1400,
   "generate_heatmap": true,
-  "generate_U_matrix": false
+  "generate_U_matrix": false,
+  "generate_heatmap_for_variable": true,
+  "generate_heatmap_for_variable_name" : "Area"
 }

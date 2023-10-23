@@ -33,6 +33,62 @@ def load_data(path: str):
     # Convert the list of lists to a NumPy array
     return data
 
+def generate_heatmap_for_variable(k:Kohonen,variable_index,variable_name,matrix):
+    new_matrix = []
+    for i in range(len(k.neurons)):
+        subList = []
+        for j in range(len(k.neurons)):
+            subList.append(k.neurons[i][j].weights[variable_index])
+        new_matrix.append(subList)
+
+    matrix_results = np.array(new_matrix)
+
+    # Create a list to store the labels for each cell
+    labels = []
+
+    for i in range(len(k.neurons)):
+        row_labels = []
+        for j in range(len(k.neurons)):
+            countries = matrix[i][j]
+            t = 0
+            group = ''
+            for name in countries:
+                group += name
+                if t < len(countries) - 1:
+                    group += ', '  # Add a comma if it's not the last country
+                if t % 3 == 2:
+                    group += '<br>'
+                t += 1
+            row_labels.append(group)
+        labels.append(row_labels)
+
+    # Reverse the color scale
+    colorscale = 'YlGnBu'
+
+
+    # Creating a heatmap
+    fig = go.Figure(data=go.Heatmap(z=matrix_results,
+                                    x=[f'Column {i + 1}' for i in range(len(k.neurons))],
+        y=[f'Row {i + 1}' for i in range(len(k.neurons))],
+        text=labels,
+        texttemplate="%{text}",
+        textfont={"size": 10},
+        colorscale=colorscale,
+        reversescale=True,
+        colorbar=dict(title="Number of Countries")))
+
+
+
+    # Customizing the layout
+    fig.update_layout(
+        title=f'Heatmap for variable {variable_name}'
+    )
+
+    # Showing the plot
+    fig.show()
+
+
+
 
 def generate_heatmap(k, matrix):
     # Create a list to store the number of countries in each position
@@ -140,6 +196,22 @@ if __name__ == "__main__":
             generate_u_matrix(model.neurons, config["k"], config["radius"])
         else:
             generate_u_matrix(model.neurons, config["k"], 1)
+
+
+    if config["generate_heatmap_for_variable"]:
+        variables = ["Area", "GDP", "Inflation", "Life.expect", "Military", "Pop.growth", "Unemployment"]
+
+        variable_to_check = config["generate_heatmap_for_variable_name"]
+
+        result = None
+
+        if variable_to_check in variables:
+            result_index = variables.index(variable_to_check)
+        else:
+            quit("heatmap variable not found")
+
+        generate_heatmap_for_variable(model,result_index,variable_to_check,resp)
+
 
 
 
