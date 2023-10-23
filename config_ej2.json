@@ -1,8 +1,8 @@
 {
   "training_data": "./training_data/letters_matrix.json",
   "selection_index": 0,
-  "selection_size": 4,
-  "noise_level": 0.1,
-  "limit": 10000,
-  "generate_energy_graph": true
+  "selection_size": 8,
+  "noise_level": 0,
+  "limit": 1000,
+  "generate_energy_graph": false
 }

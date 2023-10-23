@@ -83,18 +83,30 @@ class Hopfield:
 
         return result / (self.matrix_dimension ** 2)
 
+
+    currentPattern = 0
+
     def recognize_pattern(self, pattern, limit):
         energy = []
         prev = None
 
+        arrayResults = []
+        firstResult = pattern
         result = pattern  # por el scope de python
         i = 0
         energy.append(self.calculate_energy(result))
         while i <= limit and not np.array_equal(result, prev):
             prev = result
             result = sign(prev, self.weight_matrix @ prev)
+            arrayResults.append(result)
             energy.append(self.calculate_energy(result))
             i += 1
+
+        Hopfield.currentPattern += 1
+        with open(f"./results{Hopfield.currentPattern}.csv","w") as f:
+            np.savetxt(f,[firstResult],delimiter=",",fmt="%d")
+            for arr in arrayResults:
+                np.savetxt(f, [arr], delimiter=',', fmt='%d')
 
         if result is not None:
             return unvectorize_pattern(result), energy
