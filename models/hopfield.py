@@ -84,9 +84,8 @@ class Hopfield:
         return result / (self.matrix_dimension ** 2)
 
 
-    currentPattern = 0
 
-    def recognize_pattern(self, pattern, limit):
+    def recognize_pattern(self, pattern, limit,patternName=""):
         energy = []
         prev = None
 
@@ -102,8 +101,7 @@ class Hopfield:
             energy.append(self.calculate_energy(result))
             i += 1
 
-        Hopfield.currentPattern += 1
-        with open(f"./results{Hopfield.currentPattern}.csv","w") as f:
+        with open(f"./results{patternName}.csv","w") as f:
             np.savetxt(f,[firstResult],delimiter=",",fmt="%d")
             for arr in arrayResults:
                 np.savetxt(f, [arr], delimiter=',', fmt='%d')

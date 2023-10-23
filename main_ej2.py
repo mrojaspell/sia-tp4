@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
         print(f"\nAttempting to recognize: {orthogonal_avg[selection_index][1][idx]}")
 
-        result, energy = hopfield.recognize_pattern(noisify_pattern(selected_pattern, config["noise_level"]), config["limit"])
+        result, energy = hopfield.recognize_pattern(noisify_pattern(selected_pattern, config["noise_level"]), config["limit"],patternName=orthogonal_avg[selection_index][1][idx])
 
         patterns_energy[orthogonal_avg[selection_index][1][idx]] = {}
         patterns_energy[orthogonal_avg[selection_index][1][idx]]["values"] = energy

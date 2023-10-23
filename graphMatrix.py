@@ -5,6 +5,8 @@ import csv
 
 from matplotlib.colors import ListedColormap
 
+param = input("result grapher letter: ")
+
 # Load your data from the CSV file
 # Replace this with your own method of loading the matrix data
 # In this example, we'll use random data
@@ -15,7 +17,7 @@ frames = []
 # Function to generate a random matrix for demonstration purposes
 def generate_random_matrix():
     matrix_list = []
-    with open("results.csv", "r") as f:
+    with open(f"results{param}.csv", "r") as f:
         reader = csv.reader(f)
         for row in reader:
             currentRow = list(map(lambda x: int(x), row))
@@ -57,13 +59,13 @@ def update(frame):
     return im,
 
 # Create the animation
-ani = FuncAnimation(fig, update, frames=len(matrix_list), interval=1000, blit=True)
+ani = FuncAnimation(fig, update, frames=len(matrix_list), interval=3000, blit=True)
 
 # Customize the plot (labels, titles, etc.)
 ax.set_title(f'Frame 0')  # Initial title
 
 # Save the animation as a GIF
-ani.save('animated_matrix_values.gif', writer='pillow', fps=2)
+ani.save(f'animated_matrix_values{param}.gif', writer='pillow', fps=2)
 
 # Show the animated chart
 plt.show()
