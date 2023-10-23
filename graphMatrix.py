@@ -38,7 +38,8 @@ ax.set_facecolor('white')
 # Create an initial matrix for the first frame
 matrix_list = generate_random_matrix()
 
-custom_cmap = ListedColormap(['white'])  # Customize the colors as needed
+custom_cmap = ListedColormap(['white',"red"])  # Customize the colors as needed
+
 # Display the initial matrix as text with white background
 im = ax.matshow(matrix_list[0], cmap=custom_cmap)
 
